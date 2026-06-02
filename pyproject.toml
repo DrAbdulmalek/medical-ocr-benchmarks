@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medical-ocr-benchmarks"
+version = "1.0.0"
+description = "Unified benchmark suite for the Medical OCR ecosystem — CER, WER, medical term accuracy, latency, and throughput"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "Dr. Abdulmalek Tamer Al-husseini", email = "drabdulmalek@proton.me"}]
+keywords = ["ocr", "benchmark", "medical", "cer", "wer", "evaluation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "rapidfuzz>=2.13.0",
+    "rich>=13.0.0",
+    "click>=8.1.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "medical-ocr-postprocessor",
+    "tesseract",
+    "easyocr",
+    "paddleocr",
+]
+
+[project.scripts]
+ocr-bench = "scripts.run_all_benchmarks:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
