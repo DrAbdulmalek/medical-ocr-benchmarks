@@ -1,6 +1,8 @@
 # 🏥 Medical OCR Benchmarks / معايير تقييم OCR للوثائق الطبية
 
 [![CI Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/benchmark.yml/badge.svg)](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions)
+[![Nightly Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/nightly-benchmark.yml/badge.svg)](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/nightly-benchmark.yml)
+[![PR Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/pr-benchmark.yml/badge.svg)](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/pr-benchmark.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -135,8 +137,14 @@ medical-ocr-benchmarks/
 │   ├── test_dataset.py                # 15+ dataset tests
 │   ├── test_ci.py                     # 15+ CI threshold tests
 │   └── test_report.py                 # 10+ report tests
-└── .github/workflows/
-    └── benchmark.yml                  # GitHub Actions CI workflow
+├── .github/workflows/
+│   ├── benchmark.yml                  # GitHub Actions CI workflow
+│   ├── nightly-benchmark.yml           # Nightly automated benchmarks
+│   └── pr-benchmark.yml                 # PR-level quick benchmark
+├── reports/
+│   ├── .gitkeep                         # Placeholder for generated reports
+│   ├── nightly_report.md                # Latest nightly benchmark report
+│   └── nightly_results.json             # Latest nightly benchmark results
 ```
 
 ## How to Add New Test Cases / كيفية إضافة حالات اختبار جديدة
@@ -198,64 +206,132 @@ medical-ocr-benchmarks/
 | `description` | Human-readable description |
 | `ground_truth` | Expected OCR output text |
 
+## Nightly Benchmarks / المعايير الليلية
+
+![Nightly Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/nightly-benchmark.yml/badge.svg)
+
+A **nightly benchmark workflow** runs automatically every day at **3:00 AM UTC** (and can also be triggered manually via `workflow_dispatch`). It performs the following:
+
+1. **Installs all dependencies** (including real OCR engines: PaddleOCR + EasyOCR)
+2. **Runs full benchmarks** on English and Arabic datasets with `--check-ci` regression detection
+3. **Generates reports** — produces both Markdown and JSON reports in the `reports/` directory
+4. **Checks for regressions** — compares results against thresholds defined in `config/thresholds.yaml`; the workflow **fails** if any regression is detected
+5. **Uploads artifacts** — stores benchmark results as GitHub Actions artifacts (retained for 30 days)
+6. **Commits results** — the nightly report is automatically committed back to the repository
+
+### PR Benchmarks / معايير طلبات السحب
+
+![PR Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/pr-benchmark.yml/badge.svg)
+
+A lightweight **PR benchmark workflow** triggers on pull requests that modify `src/`, `data/`, or `config/` files. It:
+
+- Runs the full test suite (`pytest tests/ -v`)
+- Validates dataset completeness (ensures 50+ test cases)
+- Provides fast feedback without requiring heavy OCR engine installation
+
+### Latest Reports / أحدث التقارير
+
+Nightly benchmark results are stored in the [`reports/`](reports/) directory and also uploaded as [GitHub Actions artifacts](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions).
+
+---
+
+## CI Thresholds / أطراف CI
+
+CI thresholds define the **pass/fail boundaries** for benchmark results. They are configured in `config/thresholds.yaml` and enforced by both the nightly and CI benchmark workflows.
+
+### How Thresholds Work / كيف تعمل الأطراف
+
+| Check | Condition | Fail If |
+|-------|-----------|---------|
+| **Max CER** | Character Error Rate | `CER > max_cer` |
+| **Max WER** | Word Error Rate | `WER > max_wer` |
+| **Min Medical Accuracy** | Medical term recognition | `accuracy < min_medical_accuracy` |
+| **Min Throughput** | Processing speed | `throughput < min_throughput` |
+| **Max Latency** | Per-page processing time | `latency > max_latency` |
+
+Thresholds can be set **globally** (apply to all engines) or **per-engine** (override global for specific engines):
+
+```yaml
+global:
+  max_cer: 0.15               # All engines: fail if CER > 15%
+  max_wer: 0.25               # All engines: fail if WER > 25%
+  min_medical_accuracy: 0.80  # All engines: fail if accuracy < 80%
+
+engines:
+  paddleocr:                   # PaddleOCR-specific (stricter)
+    max_cer: 0.12              # Fail if CER > 12%
+    max_wer: 0.22              # Fail if WER > 22%
+  easyocr:                     # EasyOCR-specific
+    max_cer: 0.18              # Fail if CER > 18%
+```
+
+### Baseline Regression Detection / كشف التراجع
+
+In addition to absolute thresholds, baselines in `config/baselines.yaml` track expected performance. CI will flag a **5% or greater regression** from baseline values.
+
+---
+
+## Contributing Test Cases / المساهمة بحالات اختبار
+
+We welcome community contributions of new medical OCR test cases! Here's how to add one:
+
+### JSON Template / قالب JSON
+
+Copy this template and place it in the appropriate language directory (`data/english/`, `data/arabic/`, or `data/mixed/`):
+
+```json
+{
+  "id": "en_cardio_007",
+  "language": "english",
+  "specialty": "cardiology",
+  "difficulty": "medium",
+  "noise_level": "light_noise",
+  "image_path": "data/english/images/en_cardio_007.png",
+  "source": "contributed",
+  "description": "Cardiology discharge summary with handwritten annotations",
+  "ground_truth": "Patient Name: John Doe\nDiagnosis: Acute Myocardial Infarction (AMI)\nMedications: Aspirin 325mg, Clopidogrel 75mg\nFollow-up: 2 weeks"
+}
+```
+
+### Steps / الخطوات
+
+1. **Create the JSON file** in `data/<language>/` following the template above
+2. **Add the test image** to `data/<language>/images/`
+3. **Validate** your case: `pytest tests/test_dataset.py -v`
+4. **Update the index** (optional): `data/datasets.json` is auto-rebuilt on load
+5. **Submit a PR** — the PR benchmark workflow will automatically validate your contribution
+
+### Required Fields / الحقول المطلوبة
+
+| Field | Required | Description | مثال |
+|-------|----------|-------------|------|
+| `id` | ✅ | Unique identifier | `en_cardio_007` |
+| `language` | ✅ | `english`, `arabic`, or `mixed` | `arabic` |
+| `specialty` | ✅ | Medical specialty category | `cardiology` |
+| `difficulty` | ✅ | `easy`, `medium`, or `hard` | `medium` |
+| `noise_level` | ✅ | `clean`, `light_noise`, `moderate_noise`, `heavy_noise` | `light_noise` |
+| `image_path` | ✅ | Path to the test image | `data/arabic/images/ar_rx_006.png` |
+| `source` | ✅ | `synthetic`, `real`, or `contributed` | `contributed` |
+| `description` | ✅ | Human-readable description | "Prescription with doctor's notes" |
+| `ground_truth` | ✅ | Exact expected OCR output | Full text content |
+
+---
+
 ## CI Integration / تكامل CI
 
 ### GitHub Actions
 
-The included workflow (`.github/workflows/benchmark.yml`) automatically:
+The repository includes three CI workflows:
 
-1. **Runs unit tests** — validates metrics, dataset, CI, and report modules
-2. **Runs benchmarks** — tests OCR engines against the dataset
-3. **Validates dataset completeness** — ensures 50+ cases across 3+ languages
-4. **Checks CI thresholds** — fails if CER/WER exceed configured limits
-5. **Comments results on PRs** — posts benchmark summary as a PR comment
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **benchmark.yml** | Push / PR | Full CI — tests, benchmarks, threshold checks, PR comments |
+| **nightly-benchmark.yml** | Daily at 3 AM UTC / Manual | Full benchmarks with real OCR engines + report generation + artifact upload |
+| **pr-benchmark.yml** | PR on `src/`, `data/`, `config/` | Quick validation — tests + dataset completeness |
 
 ### Threshold Configuration / إعداد الأطراف
 
-Edit `config/thresholds.yaml` to customize CI failure criteria:
-
-```yaml
-global:
-  max_cer: 0.15              # Fail if CER > 15%
-  max_wer: 0.25              # Fail if WER > 25%
-  min_medical_accuracy: 0.80  # Fail if medical accuracy < 80%
-  min_throughput: 0.5         # Fail if throughput < 0.5 img/s
-  max_latency: 30.0          # Fail if latency > 30 seconds
-
-engines:
-  paddleocr:                 # Engine-specific overrides
-    max_cer: 0.12
-    max_wer: 0.22
-```
-
-### Baseline Snapshots / اللقطات المرجعية
-
-Edit `config/baselines.yaml` to set baseline metric values for regression detection:
-
-```yaml
-engines:
-  paddleocr:
-    overall:
-      cer: 0.105            # Baseline CER
-      wer: 0.195            # Baseline WER
-      medical_accuracy: 0.843  # Baseline medical accuracy
-    english:
-      cer: 0.082
-    arabic:
-      cer: 0.128
-```
-
-CI will fail if current results regress more than 5% from baseline.
-
-### Adding CI to Your Pipeline / إضافة CI إلى خط أنابيبك
-
-```yaml
-# In your .github/workflows/ci.yml
-- name: Run OCR Benchmarks
-  run: |
-    pip install medical-ocr-benchmarks
-    medocr-bench --engines paddleocr --check-ci --images
-```
+Edit `config/thresholds.yaml` to customize CI failure criteria (see [CI Thresholds](#ci-thresholds--أطراف-ci) above for full details).
 
 ## Python API / واجهة البرمجة
 
