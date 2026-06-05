@@ -1,0 +1,97 @@
+# CI Failure Thresholds — medical-ocr-benchmarks
+# أطراف الفشل في نظام CI — معايير تقييم OCR للوثائق الطبية
+# 
+# If any metric exceeds its threshold, the CI pipeline fails.
+# إذا تجاوز أي مؤشر حده المسموح، يفشل خط أنابيب CI.
+
+# Global thresholds (applied to all engines)
+global:
+  # Character Error Rate (lower is better)
+  max_cer: 0.15
+  # Word Error Rate (lower is better)  
+  max_wer: 0.25
+  # Medical term accuracy (higher is better, 0.0-1.0)
+  min_medical_accuracy: 0.80
+  # Minimum throughput (pages per second)
+  min_throughput: 0.5
+  # Maximum latency per page (seconds)
+  max_latency: 30.0
+
+# Per-engine thresholds (override global if specified)
+engines:
+  paddleocr:
+    max_cer: 0.12
+    max_wer: 0.22
+    min_medical_accuracy: 0.85
+    min_throughput: 1.0
+    max_latency: 15.0
+
+  tesseract:
+    max_cer: 0.18
+    max_wer: 0.30
+    min_medical_accuracy: 0.75
+    min_throughput: 2.0
+    max_latency: 8.0
+
+  easyocr:
+    max_cer: 0.15
+    max_wer: 0.25
+    min_medical_accuracy: 0.80
+    min_throughput: 0.5
+    max_latency: 20.0
+
+  trocr:
+    max_cer: 0.10
+    max_wer: 0.18
+    min_medical_accuracy: 0.88
+    min_throughput: 0.3
+    max_latency: 25.0
+
+  surya:
+    max_cer: 0.11
+    max_wer: 0.20
+    min_medical_accuracy: 0.85
+    min_throughput: 0.4
+    max_latency: 22.0
+
+# Per-language thresholds
+languages:
+  english:
+    max_cer: 0.10
+    max_wer: 0.18
+    min_medical_accuracy: 0.85
+
+  arabic:
+    max_cer: 0.18
+    max_wer: 0.30
+    min_medical_accuracy: 0.75
+
+  mixed:
+    max_cer: 0.20
+    max_wer: 0.32
+    min_medical_accuracy: 0.72
+
+# Per-difficulty thresholds
+difficulty:
+  easy:
+    max_cer: 0.08
+    max_wer: 0.15
+
+  medium:
+    max_cer: 0.15
+    max_wer: 0.25
+
+  hard:
+    max_cer: 0.25
+    max_wer: 0.35
+
+# Per-noise-level thresholds
+noise_levels:
+  clean:
+    max_cer: 0.08
+  light_noise:
+    max_cer: 0.12
+  moderate_noise:
+    max_cer: 0.18
+  heavy_noise:
+    max_cer: 0.25
