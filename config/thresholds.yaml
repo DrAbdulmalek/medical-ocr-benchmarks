@@ -95,3 +95,17 @@ noise_levels:
     max_cer: 0.18
   heavy_noise:
     max_cer: 0.25
+
+# Table Extraction Benchmarks
+table_extraction:
+  min_cell_accuracy: 0.85
+  min_row_completeness: 0.80
+  min_header_preservation: true
+  max_latency_ms: 5000
+
+# Mixed RTL/LTR Benchmarks
+rtl_ltr:
+  max_cer: 0.10
+  min_segment_accuracy: 0.85
+  min_numeric_preservation: 0.95
+  max_direction_errors: 2

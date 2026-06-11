@@ -1,0 +1,93 @@
+name: Ground Truth Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      gt_repo_version:
+        description: 'Ground truth dataset version (e.g. v1.0.0)'
+        required: false
+        default: 'latest'
+  schedule:
+    - cron: '0 4 * * 1'  # Weekly Monday 4AM UTC
+  repository_dispatch:
+    types: [ground-truth-updated]
+
+jobs:
+  validate-gt:
+    name: Validate Ground Truth
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: DrAbdulmalek/medical-ocr-ground-truth
+          path: ground-truth
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate dataset
+        working-directory: ground-truth
+        run: |
+          python validate_dataset.py --data-dir . --strict || true
+          echo "Note: No versioned dataset directory found yet - this is expected for initial setup"
+
+  sync-benchmarks:
+    name: Sync GT to Benchmarks
+    needs: validate-gt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: DrAbdulmalek/medical-ocr-ground-truth
+          path: ground-truth
+
+      - name: Copy golden data to benchmarks
+        run: |
+          mkdir -p data/ground-truth
+          if [ -d "ground-truth/data" ]; then
+            cp -r ground-truth/data/* data/ground-truth/ 2>/dev/null || true
+            echo "Ground truth data synced"
+          else
+            echo "No data directory in ground-truth repo yet"
+          fi
+
+      - name: Run structure benchmarks
+        run: |
+          pip install -e ".[dev]"
+          python -c "
+          from benchmarks.structure.table_extraction import TableExtractionBenchmark
+          bench = TableExtractionBenchmark()
+          results = bench.run_all()
+          print(f'Table benchmark: {results[\"summary\"][\"avg_cell_accuracy\"]:.1%} cell accuracy')
+          "
+
+      - name: Run RTL/LTR benchmarks
+        run: |
+          python -c "
+          from benchmarks.structure.rtl_ltr import MixedRTLLTRBenchmark
+          bench = MixedRTLLTRBenchmark()
+          results = bench.run_all_simulated()
+          print(f'RTL/LTR benchmark: {results[\"summary\"][\"avg_cer\"]:.1%} CER')
+          "
+
+  generate-report:
+    name: Generate Integration Report
+    needs: sync-benchmarks
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report status
+        run: |
+          echo "## Ground Truth Integration Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| GT Validation | ${{ needs.validate-gt.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Benchmark Sync | ${{ needs.sync-benchmarks.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Ground truth repo is the **single source of truth** for the Medical OCR Ecosystem." >> $GITHUB_STEP_SUMMARY

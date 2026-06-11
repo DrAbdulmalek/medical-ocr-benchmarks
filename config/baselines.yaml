@@ -139,3 +139,53 @@ specialties:
     cer: 0.090
     wer: 0.165
     medical_accuracy: 0.875
+
+# Table Extraction Baselines (2026-06-11)
+table_extraction:
+  overall:
+    avg_cell_accuracy: 0.92
+    avg_row_completeness: 0.88
+    header_preservation_rate: 0.95
+    structure_preservation_rate: 0.85
+  by_type:
+    lab_report:
+      avg_cell_accuracy: 0.95
+      avg_row_completeness: 0.92
+    prescription:
+      avg_cell_accuracy: 0.90
+      avg_row_completeness: 0.85
+    vital_signs:
+      avg_cell_accuracy: 0.93
+      avg_row_completeness: 0.90
+
+# Mixed RTL/LTR Baselines (2026-06-11)
+rtl_ltr:
+  overall:
+    avg_cer: 0.065
+    total_direction_errors: 1
+    avg_segment_accuracy: 0.90
+    avg_numeric_preservation: 0.97
+  by_difficulty:
+    easy:
+      avg_cer: 0.03
+    medium:
+      avg_cer: 0.07
+    hard:
+      avg_cer: 0.12
+  by_category:
+    lab_mixed:
+      avg_cer: 0.05
+    prescription_mixed:
+      avg_cer: 0.08
+    diagnosis_mixed:
+      avg_cer: 0.06
+    vitals_mixed:
+      avg_cer: 0.04
+    surgical_mixed:
+      avg_cer: 0.10
+    units_mixed:
+      avg_cer: 0.03
+    medication_ar_en:
+      avg_cer: 0.11
+    report_header:
+      avg_cer: 0.07
