@@ -109,3 +109,39 @@ rtl_ltr:
   min_segment_accuracy: 0.85
   min_numeric_preservation: 0.95
   max_direction_errors: 2
+
+# Noise Type Benchmarks
+noise_types:
+  max_cer: 0.20
+  per_noise_type:
+    motion_blur: 0.18
+    out_of_focus: 0.20
+    rotation_skew: 0.25
+    low_resolution: 0.25
+    watermark_overlay: 0.25
+    fax_artifacts: 0.22
+    stamp_annotation: 0.25
+    grid_lines: 0.20
+
+# Handwriting Style Benchmarks
+handwriting_styles:
+  per_difficulty:
+    easy: 0.10
+    medium: 0.18
+    hard: 0.25
+    very_hard: 0.35
+
+# Expanded Specialty Benchmarks
+specialties_expanded:
+  max_cer: 0.18
+  per_specialty:
+    neurology: 0.15
+    orthopedics: 0.12
+    dermatology: 0.15
+    ophthalmology: 0.15
+    icu_critical_care: 0.22
+    obstetrics_gynecology: 0.15
+    emergency_medicine: 0.22
+    gastroenterology: 0.15
+    pediatrics: 0.12
+    anesthesiology: 0.20
