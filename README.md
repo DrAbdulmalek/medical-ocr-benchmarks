@@ -1,3 +1,19 @@
+> ## Repository Archived
+
+This repository has been **archived**. Its code and functionality have been consolidated into the
+[omni-medical-suite](https://github.com/DrAbdulmalek/omni-medical-suite) monorepo.
+
+| Detail | Value |
+|--------|-------|
+| **Suite location** | `packages/benchmark_core/` |
+| **Original purpose** | CER/WER/medical-term accuracy with nightly regression checks |
+| **Archived on** | 2026-07-07 |
+| **Status** | Read-only - no further updates will be made here |
+
+Please use [omni-medical-suite](https://github.com/DrAbdulmalek/omni-medical-suite) for all development.
+
+---
+
 # 🏥 Medical OCR Benchmarks / معايير تقييم OCR للوثائق الطبية
 
 [![CI Benchmark](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions/workflows/benchmark.yml/badge.svg)](https://github.com/DrAbdulmalek/medical-ocr-benchmarks/actions)
