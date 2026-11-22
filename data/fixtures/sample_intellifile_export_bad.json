@@ -1,0 +1,12 @@
+{
+  "format": "intellifile-eval-v2",
+  "generated_at": "not-a-date",
+  "samples": [
+    {
+      "file": "broken.png",
+      "engine": "intellifile-vision",
+      "reference_text": "صدر سيني طبيعي.",
+      "language": "fr"
+    }
+  ]
+}

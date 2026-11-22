@@ -145,3 +145,9 @@ specialties_expanded:
     gastroenterology: 0.15
     pediatrics: 0.12
     anesthesiology: 0.20
+
+# IntelliFile pipeline export gate (roadmap P7 — one CER/WER measurement
+# across projects). Consumed by scripts/run_intellifile_gate.py.
+intellifile:
+  max_cer: 0.08
+  max_wer: 0.25

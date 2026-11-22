@@ -1,0 +1,55 @@
+{
+  "format": "intellifile-eval-v1",
+  "generated_at": "2026-11-21T23:40:00Z",
+  "samples": [
+    {
+      "file": "radio_chest_014.png",
+      "engine": "intellifile-vision",
+      "reference_text": "صدر سيني: توجد ظل صغير في القاعدة اليمنى مع انصباب بلوري محدود.",
+      "ocr_text": "صدر سيني: توجد ظل صغير في القاعده اليمنى مع انصباب بلوري محدود.",
+      "language": "ar"
+    },
+    {
+      "file": "ct_head_087.png",
+      "engine": "intellifile-vision",
+      "reference_text": "أشعة مقطعية للرأس: لا توجد كتلة أو عقدة، البطينات طبيعية.",
+      "ocr_text": "أشعة مقطعية للرأس: لا توجد كتلة أو عقدة، البطينات طبيعيه.",
+      "language": "ar"
+    },
+    {
+      "file": "mri_knee_203.png",
+      "engine": "intellifile-legacy",
+      "reference_text": "رنين مغناطيسي للركبة: تمزق جزئي في الغضروف الداخلي مع تورم خفيف.",
+      "ocr_text": "رنين مغناطيسي للركبة: تمزق جزئي في الغضروف الداخلي مع تورم خفي.",
+      "language": "ar"
+    },
+    {
+      "file": "xray_abdomen_051.png",
+      "engine": "intellifile-legacy",
+      "reference_text": "صورة سينية للبطن: انسداد معوي جزئي مع مستويات هوائية غير طبيعية.",
+      "ocr_text": "صورة سينية للبطن: انسذاد معوي جزئي مع مستويات هوائية غير طبيعية.",
+      "language": "ar"
+    },
+    {
+      "file": "ultrasound_liver_129.png",
+      "engine": "intellifile-vision",
+      "reference_text": "موجات صوتية على الكبد: كبد بحجم طبيعي مع نخر بؤري صغير.",
+      "ocr_text": "موجات صوتية على الكبد: كببد بحجم طبيعي مع نخر بؤري صغير.",
+      "language": "ar"
+    },
+    {
+      "file": "ct_chest_312.png",
+      "engine": "intellifile-legacy",
+      "reference_text": "أشعة مقطعية للصدر: عقدة قطرها 6 ملم في الفص العلوي الأيمن.",
+      "ocr_text": "أشعة مقطعية للصدر: عقدة قطرها 9 ملم في الفص العلوي الأيمن.",
+      "language": "ar"
+    },
+    {
+      "file": "mammogram_044.png",
+      "engine": "intellifile-vision",
+      "reference_text": "تصوير الثدي الشعاعي: تكلسات دقيقة منتشرة، لا توجد كتلة ملموسة.",
+      "ocr_text": "تصوير الثدي الشعاعي: تكلسات دقيقة منتشرةلا توجد كتلة ملموسة.",
+      "language": "ar"
+    }
+  ]
+}
